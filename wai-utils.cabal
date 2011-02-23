@@ -19,7 +19,7 @@ Library
   Build-depends:       base 
                      , bytestring
                      , enumerator
-                     , mtl
+                     , transformers
                      , wai
   
   -- Modules not exported by this package.

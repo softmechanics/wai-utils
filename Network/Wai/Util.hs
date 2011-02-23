@@ -1,4 +1,3 @@
-{-# LANGUAGE PackageImports #-}
 module Network.Wai.Util (
     withLBS
   ) where
@@ -6,7 +5,7 @@ module Network.Wai.Util (
 import Control.Concurrent
 import Control.Concurrent.MVar
 import Control.Exception (finally)
-import "mtl" Control.Monad.Trans
+import Control.Monad.IO.Class
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy as L
