@@ -14,6 +14,7 @@ import Data.Enumerator (($$))
 import qualified Data.Enumerator as E
 import Data.IORef
 import Network.Wai
+import System.IO.Unsafe
 
 withLBS :: (L.ByteString -> IO a) -> E.Iteratee B.ByteString IO a
 withLBS f = do
@@ -22,7 +23,8 @@ withLBS f = do
     mres <- newEmptyMVar
     ialive <- newIORef True
     forkIO $ finally 
-      (putMVar mres =<< f =<< evalLBS mbs) 
+      (do a <- f =<< evalLBS mbs
+          a `seq` putMVar mres a) 
       (writeIORef ialive False)
     return (ialive, mbs, mres)
   iterateLBS ialive mbs
@@ -30,7 +32,8 @@ withLBS f = do
 
 evalLBS :: MVar [B.ByteString] -> IO L.ByteString
 evalLBS mbs = fmap L.fromChunks go
-  where go = do next <- takeMVar mbs
+  where go = unsafeInterleaveIO $ do 
+                next <- takeMVar mbs
                 case next of
                      [] -> return []
                      bs -> fmap (bs ++) go
