@@ -1,0 +1,30 @@
+Name:                wai-utils
+Version:             0.1
+Synopsis:            Various utilities for writing WAI apps.
+Homepage:            https://github.com/softmechanics/wai-utils/
+License:             BSD3
+License-file:        LICENSE
+Author:              Matt Brown
+Maintainer:          matt@softmechanics.net
+Category:            Web
+Build-type:          Simple
+Extra-source-files:  test/test.hs, test/WithLBS.hs
+
+Cabal-version:       >=1.2
+
+
+Library
+  Exposed-modules:     Network.Wai.Util
+  
+  Build-depends:       base 
+                     , bytestring
+                     , enumerator
+                     , mtl
+                     , wai
+  
+  -- Modules not exported by this package.
+  -- Other-modules:       
+  
+  -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
+  -- Build-tools:         
+  
