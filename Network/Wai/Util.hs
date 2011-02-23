@@ -4,7 +4,7 @@ module Network.Wai.Util (
 
 import Control.Concurrent
 import Control.Concurrent.MVar
-import Control.Exception (finally)
+import Control.Exception (SomeException, catch, finally)
 import Control.Monad.IO.Class
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as B8
@@ -14,16 +14,19 @@ import qualified Data.Enumerator as E
 import Data.IORef
 import Network.Wai
 import System.IO.Unsafe
+import Prelude hiding (catch)
 
-withLBS :: (L.ByteString -> IO a) -> E.Iteratee B.ByteString IO a
+withLBS :: (L.ByteString -> IO a) -> E.Iteratee B.ByteString IO (Either SomeException a)
 withLBS f = do
   (ialive, mbs, mres) <- liftIO $ do
     mbs <- newEmptyMVar
     mres <- newEmptyMVar
     ialive <- newIORef True
     forkIO $ finally 
-      (do a <- f =<< evalLBS mbs
-          a `seq` putMVar mres a) 
+      (catch
+        (do a <- f =<< evalLBS mbs
+            a `seq` putMVar mres (Right a)) 
+        (putMVar mres . Left))
       (writeIORef ialive False)
     return (ialive, mbs, mres)
   iterateLBS ialive mbs

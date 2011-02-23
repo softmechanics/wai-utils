@@ -16,14 +16,17 @@ withLBSTester f = do
   let enum = E.enumList 2 src
   E.run_ (enum $$ withLBS f)
 
+fromRight def (Left _) = def
+fromRight _ (Right r) = r
+
 testWithLBS = test [
     "withLBS complete" ~: do
-      b <- withLBSTester $ \lbs -> 
+      res <- withLBSTester $ \lbs -> 
         return $ lbs == out
-      assert b
+      assert $ fromRight False res
   , "withLBS parital" ~: do
-      b <- withLBSTester $ \lbs -> do
+      res <- withLBSTester $ \lbs -> do
         return $ "0" == (B8.unpack $ head $ L.toChunks lbs) 
-      assert b
+      assert $ fromRight False res
   ]
 
